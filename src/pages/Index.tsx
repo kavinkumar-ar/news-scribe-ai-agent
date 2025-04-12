@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
@@ -196,105 +195,130 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen max-w-7xl mx-auto px-4 py-6 flex flex-col md:flex-row gap-6">
+    <div className="min-h-screen max-w-7xl mx-auto px-4 py-6">
       {!apiKeyState.isSet ? (
         <ApiKeyInput apiKeyState={apiKeyState} setApiKeyState={setApiKeyState} />
-      ) : selectedArticle ? (
-        <div className="flex-grow">
-          {articleSummary ? (
-            <ArticleSummary 
-              article={selectedArticle} 
-              summary={articleSummary} 
-              onClose={() => setSelectedArticle(null)} 
-            />
-          ) : (
-            <div className="h-full flex items-center justify-center">
-              <div className="flex flex-col items-center gap-3">
-                <div className="animate-pulse-slow">
-                  <Newspaper size={48} className="text-newsblue" />
+      ) : (
+        <div className="flex flex-col lg:flex-row gap-6">
+          <div className="flex-1 flex flex-col">
+            <div className="flex items-center justify-between mb-4">
+              <h1 className="text-2xl font-serif font-bold text-newsblue flex items-center gap-2">
+                <Newspaper />
+                <span>NewsScribe AI</span>
+              </h1>
+              {chatMessages.length > 1 && (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="flex items-center gap-1"
+                  onClick={handleClearChat}
+                >
+                  <Trash size={16} />
+                  <span>Clear Chat</span>
+                </Button>
+              )}
+            </div>
+            
+            {userPreference && userPreference.interests.length > 0 && (
+              <InterestsDisplay 
+                interests={userPreference.interests} 
+                onRemove={handleRemoveInterest}
+              />
+            )}
+            
+            <div className="flex-grow bg-white border rounded-lg shadow-sm mb-4 flex flex-col">
+              <ScrollArea className="flex-grow p-4">
+                <div className="flex flex-col">
+                  {chatMessages.map((message) => (
+                    <ChatMessageComponent key={message.id} message={message} />
+                  ))}
+                  {loading && (
+                    <div className="flex justify-start mb-6">
+                      <div className="bg-muted rounded-lg p-4 max-w-[80%] rounded-tl-none flex items-center gap-2">
+                        <div className="animate-pulse-slow">
+                          <Newspaper size={20} />
+                        </div>
+                        <p>Analyzing news...</p>
+                      </div>
+                    </div>
+                  )}
+                  <div ref={chatEndRef} />
                 </div>
-                <p className="text-lg font-medium">Generating summary...</p>
+              </ScrollArea>
+              
+              <Separator />
+              
+              <div className="p-4">
+                <form 
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleSendMessage();
+                  }}
+                  className="flex items-end gap-2"
+                >
+                  <div className="flex-grow">
+                    <Textarea
+                      placeholder="Ask about news, request summaries, or specific topics..."
+                      value={userMessage}
+                      onChange={(e) => setUserMessage(e.target.value)}
+                      className="resize-none"
+                      rows={2}
+                    />
+                  </div>
+                  <Button 
+                    type="submit" 
+                    disabled={!userMessage.trim() || loading || !apiKeyState.isSet}
+                    className="bg-newsblue hover:bg-newsblue-light"
+                  >
+                    <Send size={18} />
+                  </Button>
+                </form>
+              </div>
+            </div>
+          </div>
+          
+          {selectedArticle ? (
+            <div className="flex-1">
+              {articleSummary ? (
+                <ArticleSummary 
+                  article={selectedArticle} 
+                  summary={articleSummary} 
+                  onClose={() => setSelectedArticle(null)} 
+                />
+              ) : (
+                <div className="h-full flex items-center justify-center">
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="animate-pulse-slow">
+                      <Newspaper size={48} className="text-newsblue" />
+                    </div>
+                    <p className="text-lg font-medium">Generating summary...</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="flex-1">
+              <div className="bg-white border rounded-lg shadow-sm p-4">
+                <h2 className="text-xl font-medium mb-4">News Articles</h2>
+                <div className="grid grid-cols-1 gap-4">
+                  {articles.map((article) => (
+                    <NewsCard 
+                      key={article.url} 
+                      article={article} 
+                      onSummarize={handleSummarizeArticle} 
+                    />
+                  ))}
+                  {articles.length === 0 && (
+                    <div className="text-center p-6">
+                      <Newspaper size={48} className="text-muted-foreground mx-auto mb-2" />
+                      <p className="text-muted-foreground">No articles found. Try searching for a different topic.</p>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           )}
         </div>
-      ) : (
-        <>
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-serif font-bold text-newsblue flex items-center gap-2">
-              <Newspaper />
-              <span>NewsScribe AI</span>
-            </h1>
-            {chatMessages.length > 1 && (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="flex items-center gap-1"
-                onClick={handleClearChat}
-              >
-                <Trash size={16} />
-                <span>Clear Chat</span>
-              </Button>
-            )}
-          </div>
-          
-          {userPreference && userPreference.interests.length > 0 && (
-            <InterestsDisplay 
-              interests={userPreference.interests} 
-              onRemove={handleRemoveInterest}
-            />
-          )}
-          
-          <div className="flex-grow bg-white border rounded-lg shadow-sm mb-4 flex flex-col">
-            <ScrollArea className="flex-grow p-4">
-              <div className="flex flex-col">
-                {chatMessages.map((message) => (
-                  <ChatMessageComponent key={message.id} message={message} />
-                ))}
-                {loading && (
-                  <div className="flex justify-start mb-6">
-                    <div className="bg-muted rounded-lg p-4 max-w-[80%] rounded-tl-none flex items-center gap-2">
-                      <div className="animate-pulse-slow">
-                        <Newspaper size={20} />
-                      </div>
-                      <p>Analyzing news...</p>
-                    </div>
-                  </div>
-                )}
-                <div ref={chatEndRef} />
-              </div>
-            </ScrollArea>
-            
-            <Separator />
-            
-            <div className="p-4">
-              <form 
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleSendMessage();
-                }}
-                className="flex items-end gap-2"
-              >
-                <div className="flex-grow">
-                  <Textarea
-                    placeholder="Ask about news, request summaries, or specific topics..."
-                    value={userMessage}
-                    onChange={(e) => setUserMessage(e.target.value)}
-                    className="resize-none"
-                    rows={2}
-                  />
-                </div>
-                <Button 
-                  type="submit" 
-                  disabled={!userMessage.trim() || loading || !apiKeyState.isSet}
-                  className="bg-newsblue hover:bg-newsblue-light"
-                >
-                  <Send size={18} />
-                </Button>
-              </form>
-            </div>
-          </div>
-        </>
       )}
     </div>
   );
