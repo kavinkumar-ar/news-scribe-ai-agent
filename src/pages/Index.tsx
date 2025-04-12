@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,7 +8,7 @@ import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import { Article, ChatMessage, ApiKeyState, UserPreference } from '@/types';
 import ApiKeyInput from '@/components/ApiKeyInput';
-import ChatMessage as ChatMessageComponent from '@/components/ChatMessage';
+import ChatMessageComponent from '@/components/ChatMessage';
 import NewsCard from '@/components/NewsCard';
 import ArticleSummary from '@/components/ArticleSummary';
 import InterestsDisplay from '@/components/InterestsDisplay';
