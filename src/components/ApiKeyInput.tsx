@@ -12,15 +12,21 @@ interface ApiKeyInputProps {
 }
 
 const API_KEY_STORAGE_KEY = 'newsscribe_api_key';
+const DEFAULT_API_KEY = '858d53bfd9114bb49e6638932279819c';
 
 const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ apiKeyState, setApiKeyState }) => {
   const [inputValue, setInputValue] = useState('');
   const [showKey, setShowKey] = useState(false);
   
   useEffect(() => {
+    // First check localStorage for a saved key
     const savedApiKey = localStorage.getItem(API_KEY_STORAGE_KEY);
     if (savedApiKey) {
       setApiKeyState({ apiKey: savedApiKey, isSet: true });
+    } else {
+      // If no key in localStorage, use the default key
+      localStorage.setItem(API_KEY_STORAGE_KEY, DEFAULT_API_KEY);
+      setApiKeyState({ apiKey: DEFAULT_API_KEY, isSet: true });
     }
   }, [setApiKeyState]);
 
@@ -34,7 +40,8 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ apiKeyState, setApiKeyState }
 
   const handleResetKey = () => {
     localStorage.removeItem(API_KEY_STORAGE_KEY);
-    setApiKeyState({ apiKey: '', isSet: false });
+    localStorage.setItem(API_KEY_STORAGE_KEY, DEFAULT_API_KEY);
+    setApiKeyState({ apiKey: DEFAULT_API_KEY, isSet: true });
   };
 
   const toggleShowKey = () => {
@@ -49,7 +56,7 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ apiKeyState, setApiKeyState }
           News API Key Setup
         </CardTitle>
         <CardDescription>
-          NewsScribe requires a News API key to fetch real-time news data. You can get a free API key by signing up at <a href="https://newsapi.org/" target="_blank" rel="noopener noreferrer" className="text-highlight underline">newsapi.org</a>
+          NewsScribe is using a built-in News API key. You can optionally provide your own API key from <a href="https://newsapi.org/" target="_blank" rel="noopener noreferrer" className="text-highlight underline">newsapi.org</a> for better performance.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -86,14 +93,14 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ apiKeyState, setApiKeyState }
           </div>
         )}
       </CardContent>
-      {apiKeyState.isSet && (
+      {apiKeyState.isSet && apiKeyState.apiKey !== DEFAULT_API_KEY && (
         <CardFooter>
           <Button 
             variant="outline" 
             onClick={handleResetKey}
             className="text-destructive border-destructive hover:bg-destructive/10"
           >
-            Reset API Key
+            Reset to Default API Key
           </Button>
         </CardFooter>
       )}
