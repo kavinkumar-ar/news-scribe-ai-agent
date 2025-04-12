@@ -84,6 +84,6 @@ export async function generateResponse(
       }
       
       resolve(response);
-    }, 1500);
+    }, 1000); // Reduced delay from 1500ms to 1000ms for faster response
   });
 }

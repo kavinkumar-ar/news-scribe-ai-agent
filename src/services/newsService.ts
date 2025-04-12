@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 
 const BASE_URL = 'https://newsapi.org/v2';
 // Use the provided API key directly in the code as requested
-const API_KEY = '858d53bfd9114bb49e6638932279819c';
+const DEFAULT_API_KEY = '858d53bfd9114bb49e6638932279819c';
 
 // Mock articles to display when API fails
 const MOCK_ARTICLES: Article[] = [
@@ -257,7 +257,7 @@ export async function fetchTopHeadlines(apiKey?: string, query?: string, sources
 
     const response = await fetch(`${BASE_URL}/top-headlines?${params.toString()}`, {
       headers: {
-        'X-Api-Key': apiKey || API_KEY
+        'X-Api-Key': apiKey || DEFAULT_API_KEY
       }
     });
 
@@ -296,7 +296,7 @@ export async function searchNews(apiKey?: string, query: string = ''): Promise<A
 
     const response = await fetch(`${BASE_URL}/everything?${params.toString()}`, {
       headers: {
-        'X-Api-Key': apiKey || API_KEY
+        'X-Api-Key': apiKey || DEFAULT_API_KEY
       }
     });
 
