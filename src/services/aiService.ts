@@ -68,10 +68,19 @@ export async function generateResponse(
         if (recentArticles.length > 3) {
           response += `I found ${recentArticles.length - 3} more articles on this topic. Would you like me to summarize any specific one?`;
         } else {
-          response += `Would you like me to provide more details about any of these stories?`;
+          response += `Would you like me to learn more about any of these stories?`;
         }
       } else {
-        response += `I couldn't find recent news articles matching your query. Would you like me to search for something else?`;
+        // Add more variety to the "no results" response
+        const noResultsResponses = [
+          `I couldn't find recent news articles matching your query. Would you like me to search for something else?`,
+          `I don't see any recent news about that topic. Perhaps try a different search term?`,
+          `No recent articles found on this subject. What other topics interest you?`,
+          `There don't seem to be recent news articles on that. Can I help you find information on another topic?`,
+          `I don't have any recent articles about that. Would you like to explore a different subject?`
+        ];
+        
+        response += noResultsResponses[Math.floor(Math.random() * noResultsResponses.length)];
       }
       
       resolve(response);

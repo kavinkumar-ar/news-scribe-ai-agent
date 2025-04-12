@@ -5,12 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { ApiKeyState } from '@/types';
 import { Eye, EyeOff, Key } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface ApiKeyInputProps {
   apiKeyState: ApiKeyState;
   setApiKeyState: React.Dispatch<React.SetStateAction<ApiKeyState>>;
 }
 
+// Use the provided API key directly in the code as requested
 const API_KEY_STORAGE_KEY = 'newsscribe_api_key';
 const DEFAULT_API_KEY = '858d53bfd9114bb49e6638932279819c';
 
@@ -19,15 +21,10 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ apiKeyState, setApiKeyState }
   const [showKey, setShowKey] = useState(false);
   
   useEffect(() => {
-    // First check localStorage for a saved key
-    const savedApiKey = localStorage.getItem(API_KEY_STORAGE_KEY);
-    if (savedApiKey) {
-      setApiKeyState({ apiKey: savedApiKey, isSet: true });
-    } else {
-      // If no key in localStorage, use the default key
-      localStorage.setItem(API_KEY_STORAGE_KEY, DEFAULT_API_KEY);
-      setApiKeyState({ apiKey: DEFAULT_API_KEY, isSet: true });
-    }
+    // Immediately set the default API key
+    localStorage.setItem(API_KEY_STORAGE_KEY, DEFAULT_API_KEY);
+    setApiKeyState({ apiKey: DEFAULT_API_KEY, isSet: true });
+    toast.success('Using built-in News API key');
   }, [setApiKeyState]);
 
   const handleSaveKey = () => {
@@ -35,6 +32,7 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ apiKeyState, setApiKeyState }
       localStorage.setItem(API_KEY_STORAGE_KEY, inputValue.trim());
       setApiKeyState({ apiKey: inputValue.trim(), isSet: true });
       setInputValue('');
+      toast.success('Custom API key saved');
     }
   };
 
@@ -42,6 +40,7 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ apiKeyState, setApiKeyState }
     localStorage.removeItem(API_KEY_STORAGE_KEY);
     localStorage.setItem(API_KEY_STORAGE_KEY, DEFAULT_API_KEY);
     setApiKeyState({ apiKey: DEFAULT_API_KEY, isSet: true });
+    toast.success('Reset to default API key');
   };
 
   const toggleShowKey = () => {
